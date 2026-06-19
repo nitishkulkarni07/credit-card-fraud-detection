@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Fraud Shield Dashboard</title>
+
+    <!-- Chart JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(14, 165, 233, 0.25), transparent 35%),
+                linear-gradient(135deg, #020617, #0f172a, #111827);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 94%;
+            margin: auto;
+            padding-bottom: 40px;
+        }
+
+        .navbar {
+            margin-top: 20px;
+            padding: 20px 28px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(56,189,248,0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(18px);
+        }
+
+        .navbar h2 {
+            color: #38bdf8;
+            font-size: 26px;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-right span {
+            color: #cbd5e1;
+        }
+
+        .nav-right a {
+            color: white;
+            background: #ef4444;
+            padding: 9px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .hero {
+            padding: 35px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            color: #e0f2fe;
+            font-size: 38px;
+        }
+
+        .hero p {
+            color: #94a3b8;
+            margin-top: 10px;
+            font-size: 17px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            width: auto;
+            padding: 13px 20px;
+            border: 1px solid rgba(56,189,248,0.3);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            box-shadow: 0 0 18px rgba(56,189,248,0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 22px;
+            padding: 28px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 0 25px rgba(56,189,248,0.08);
+        }
+
+        .card h2 {
+            color: #38bdf8;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 7px;
+            color: #cbd5e1;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            border: 1px solid rgba(56,189,248,0.3);
+            background: rgba(15,23,42,0.9);
+            color: white;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 14px rgba(56,189,248,0.35);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            transition: 0.3s;
+            box-shadow: 0 0 18px rgba(56,189,248,0.45);
+        }
+
+        .notification {
+            background: rgba(15,23,42,0.85);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            border-left: 4px solid #38bdf8;
+        }
+
+        .notification h4 {
+            color: #e0f2fe;
+        }
+
+        .notification p {
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .result-card {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .safe {
+            border: 1px solid rgba(34,197,94,0.75);
+            box-shadow: 0 0 25px rgba(34,197,94,0.22);
+        }
+
+        .safe h2 {
+            color: #22c55e;
+        }
+
+        .fraud {
+            border: 1px solid rgba(239,68,68,0.75);
+            box-shadow: 0 0 25px rgba(239,68,68,0.22);
+        }
+
+        .fraud h2 {
+            color: #ef4444;
+        }
+
+        .result-icon {
+            font-size: 52px;
+            margin-bottom: 10px;
+        }
+
+        .risk-box {
+            margin: 18px 0;
+            padding: 18px;
+            border-radius: 15px;
+            background: rgba(15,23,42,0.9);
+        }
+
+        .risk-box span {
+            color: #94a3b8;
+        }
+
+        .risk-box h1 {
+            color: #38bdf8;
+            font-size: 36px;
+            margin-top: 5px;
+        }
+
+        .proceed-btn {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+        }
+
+        .warning-btn {
+            background: linear-gradient(135deg, #f97316, #facc15);
+            color: #111827;
+        }
+
+        .success-card {
+            border: 1px solid rgba(34,197,94,0.75);
+            color: #bbf7d0;
+        }
+
+        .cancel-card,
+        .error-card {
+            border: 1px solid rgba(239,68,68,0.75);
+            color: #fecaca;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.09);
+            padding: 22px;
+            border-radius: 18px;
+            border: 1px solid rgba(56,189,248,0.25);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .stat-card h1 {
+            color: #38bdf8;
+            font-size: 36px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        canvas {
+            max-height: 320px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            color: #cbd5e1;
+        }
+
+        th {
+            color: #38bdf8;
+            background: rgba(15,23,42,0.9);
+        }
+
+        .badge-safe {
+            background: rgba(34,197,94,0.2);
+            color: #86efac;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .badge-fraud {
+            background: rgba(239,68,68,0.2);
+            color: #fca5a5;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .tip-card {
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(56,189,248,0.25);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .tip-card h3 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+
+        .tip-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        @media screen and (max-width: 950px) {
+            .dashboard-grid,
+            .charts-grid,
+            .stats-grid,
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-right {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <nav class="navbar">
+        <h2>AI Fraud Shield</h2>
+
+        <div class="nav-right">
+            <span>Welcome, {{ user_name }}</span>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Credit Card Fraud Detection Dashboard</h1>
+        <p>Predict fraud, analyze model decisions, and track checked transactions.</p>
+    </section>
+
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab('prediction', this)">Prediction</button>
+        <button class="tab-button" onclick="openTab('analysis', this)">Analysis</button>
+        <button class="tab-button" onclick="openTab('history', this)">Transaction History</button>
+        <button class="tab-button" onclick="openTab('tips', this)">Security Tips</button>
+    </div>
+
+    <!-- Prediction Tab -->
+    <div id="prediction" class="tab-content active">
+        <div class="dashboard-grid">
+
+            <div class="card">
+                <h2>Enter Transaction Details</h2>
+
+                <form action="/predict" method="POST">
+
+                    <label>Transaction Amount</label>
+                    <input type="number" name="amount" placeholder="Example: 50000" required>
+
+                    <label>Transaction Type</label>
+                    <select name="transaction_type" required>
+                        <option value="">Select Transaction Type</option>
+                        <option value="Online">Online</option>
+                        <option value="POS">POS</option>
+                        <option value="ATM">ATM</option>
+                        <option value="International">International</option>
+                    </select>
+
+                    <label>Merchant Category</label>
+                    <select name="merchant_category" required>
+                        <option value="">Select Merchant Category</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Food">Food</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Gaming">Gaming</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Fuel">Fuel</option>
+                        <option value="Jewellery">Jewellery</option>
+                    </select>
+
+                    <label>Transaction Location</label>
+                    <select name="location" required>
+                        <option value="">Select Location</option>
+                        <option value="Same City">Same City</option>
+                        <option value="Different City">Different City</option>
+                        <option value="Different State">Different State</option>
+                        <option value="International">International</option>
+                    </select>
+
+                    <label>Card Type</label>
+                    <select name="card_type" required>
+                        <option value="">Select Card Type</option>
+                        <option value="Credit">Credit</option>
+                        <option value="Debit">Debit</option>
+                    </select>
+
+                    <label>Transaction Hour</label>
+                    <input type="number" name="hour" min="0" max="23" placeholder="0 to 23" required>
+
+                    <label>Previous Transactions Today</label>
+                    <input type="number" name="previous_transactions" placeholder="Example: 5" required>
+
+                    <label>Foreign Transaction</label>
+                    <select name="is_foreign_transaction" required>
+                        <option value="">Select Option</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+
+                    <button type="submit">Check Fraud Risk</button>
+
+                </form>
+            </div>
+
+            <div>
+                <div class="card">
+                    <h2>Live Notification</h2>
+
+                    <div class="notification">
+                        <h4>Security Status</h4>
+                        <p>Fraud detection model is active.</p>
+                    </div>
+
+                    <div class="notification">
+                        <h4>AI Analysis</h4>
+                        <p>The system checks amount, location, time, merchant type, and transaction pattern.</p>
+                    </div>
+
+                    <div class="notification">
+                        <h4>Before Payment Alert</h4>
+                        <p>Check transaction safety before proceeding.</p>
+                    </div>
+                </div>
+
+                {% if success_message %}
+                <div class="card success-card result-card">
+                    <h2>✅ Transaction Successful</h2>
+                    <p>{{ success_message }}</p>
+                </div>
+                {% endif %}
+
+                {% if cancel_message %}
+                <div class="card cancel-card result-card">
+                    <h2>❌ Transaction Cancelled</h2>
+                    <p>{{ cancel_message }}</p>
+                </div>
+                {% endif %}
+
+                {% if result %}
+                <div class="card result-card {{ status }}">
+
+                    {% if status == "safe" %}
+                        <div class="result-icon">✅</div>
+                    {% else %}
+                        <div class="result-icon">⚠️</div>
+                    {% endif %}
+
+                    <h2>{{ result }}</h2>
+                    <p>{{ message }}</p>
+
+                    <div class="risk-box">
+                        <span>Fraud Risk Score</span>
+                        <h1>{{ fraud_probability }}%</h1>
+                    </div>
+
+                    <p>Normal Probability: {{ normal_probability }}%</p>
+                    <p>Fraud Probability: {{ fraud_probability }}%</p>
+
+                    {% if status == "safe" %}
+                    <form action="/proceed_transaction" method="POST">
+                        <button type="submit" class="proceed-btn">Proceed Transaction</button>
+                    </form>
+                    {% else %}
+                    <form action="/cancel_transaction" method="POST">
+                        <button type="submit" class="cancel-btn">Cancel Transaction</button>
+                    </form>
+
+                    <form action="/proceed_transaction" method="POST">
+                        <button type="submit" class="warning-btn">Proceed Anyway</button>
+                    </form>
+                    {% endif %}
+
+                </div>
+                {% endif %}
+
+                {% if error %}
+                <div class="card error-card result-card">
+                    <h2>Error</h2>
+                    <p>{{ error }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Analysis Tab -->
+    <div id="analysis" class="tab-content">
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Checked</h3>
+                <h1>{{ analysis_data.total_checked | default(0) }}</h1>
+            </div>
+
+            <div class="stat-card">
+                <h3>Normal Transactions</h3>
+                <h1>{{ analysis_data.normal_count | default(0) }}</h1>
+            </div>
+
+            <div class="stat-card">
+                <h3>Fraud Transactions</h3>
+                <h1>{{ analysis_data.fraud_count | default(0) }}</h1>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="card">
+                <h2>Fraud vs Normal Analysis</h2>
+                <canvas id="fraudPieChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>Recent Fraud Risk Score</h2>
+                <canvas id="riskLineChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- History Tab -->
+    <div id="history" class="tab-content">
+        <div class="card">
+            <h2>Checked Transaction History</h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Merchant</th>
+                            <th>Location</th>
+                            <th>Card</th>
+                            <th>Hour</th>
+                            <th>Previous Txns</th>
+                            <th>Foreign</th>
+                            <th>Result</th>
+                            <th>Fraud Risk</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for t in transactions %}
+                        <tr>
+                            <td>{{ t[12] }}</td>
+                            <td>₹{{ t[0] }}</td>
+                            <td>{{ t[1] }}</td>
+                            <td>{{ t[2] }}</td>
+                            <td>{{ t[3] }}</td>
+                            <td>{{ t[4] }}</td>
+                            <td>{{ t[5] }}</td>
+                            <td>{{ t[6] }}</td>
+                            <td>{{ t[7] }}</td>
+                            <td>
+                                {% if t[9] == "safe" %}
+                                    <span class="badge-safe">Not Fraud</span>
+                                {% else %}
+                                    <span class="badge-fraud">Fraud</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ t[11] }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if transactions|length == 0 %}
+                <p style="color:#94a3b8; margin-top:20px;">No transactions checked yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Security Tips Tab -->
+    <div id="tips" class="tab-content">
+        <div class="tips-grid">
+
+            <div class="tip-card">
+                <h3>🔐 Verify Merchant</h3>
+                <p>Always check the merchant name, website URL, and payment page before entering card details.</p>
+            </div>
+
+            <div class="tip-card">
+                <h3>🌍 Check Location</h3>
+                <p>If a transaction appears from an unknown city, state, or country, verify it before proceeding.</p>
+            </div>
+
+            <div class="tip-card">
+                <h3>⏰ Watch Odd Hours</h3>
+                <p>High-value transactions during late-night hours can be suspicious and should be checked carefully.</p>
+            </div>
+
+            <div class="tip-card">
+                <h3>💳 Use Alerts</h3>
+                <p>Enable SMS or email alerts for every credit card transaction to detect fraud quickly.</p>
+            </div>
+
+            <div class="tip-card">
+                <h3>🚫 Avoid Public Wi-Fi</h3>
+                <p>Do not make payments using public Wi-Fi networks because they may expose sensitive card data.</p>
+            </div>
+
+            <div class="tip-card">
+                <h3>📊 Review History</h3>
+                <p>Regularly check your transaction history to identify unknown or suspicious payments.</p>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Hidden chart data from Flask -->
+<div id="chartData"
+     data-normal="{{ analysis_data.normal_count | default(0) }}"
+     data-fraud="{{ analysis_data.fraud_count | default(0) }}"
+     data-labels='{{ analysis_data.recent_labels | default([]) | tojson }}'
+     data-scores='{{ analysis_data.recent_fraud_scores | default([]) | tojson }}'>
+</div>
+
+<script>
+    function openTab(tabName, buttonElement) {
+        let contents = document.querySelectorAll(".tab-content");
+        let buttons = document.querySelectorAll(".tab-button");
+
+        contents.forEach(content => content.classList.remove("active"));
+        buttons.forEach(button => button.classList.remove("active"));
+
+        document.getElementById(tabName).classList.add("active");
+        buttonElement.classList.add("active");
+
+        if (tabName === "analysis") {
+            setTimeout(loadCharts, 100);
+        }
+    }
+
+    let chartsLoaded = false;
+    let pieChart = null;
+    let lineChart = null;
+
+    function loadCharts() {
+        if (chartsLoaded) {
+            return;
+        }
+
+        chartsLoaded = true;
+
+        const chartData = document.getElementById("chartData");
+
+        const normalCount = Number(chartData.dataset.normal || 0);
+        const fraudCount = Number(chartData.dataset.fraud || 0);
+        const recentLabels = JSON.parse(chartData.dataset.labels || "[]");
+        const recentFraudScores = JSON.parse(chartData.dataset.scores || "[]");
+
+        const pieCtx = document.getElementById("fraudPieChart");
+
+        pieChart = new Chart(pieCtx, {
+            type: "doughnut",
+            data: {
+                labels: ["Normal", "Fraud"],
+                datasets: [{
+                    data: [normalCount, fraudCount],
+                    backgroundColor: ["#22c55e", "#ef4444"],
+                    borderColor: ["#16a34a", "#dc2626"],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "white"
+                        }
+                    }
+                }
+            }
+        });
+
+        const lineCtx = document.getElementById("riskLineChart");
+
+        lineChart = new Chart(lineCtx, {
+            type: "line",
+            data: {
+                labels: recentLabels,
+                datasets: [{
+                    label: "Fraud Risk %",
+                    data: recentFraudScores,
+                    borderColor: "#38bdf8",
+                    backgroundColor: "rgba(56, 189, 248, 0.2)",
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        ticks: {
+                            color: "white"
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            color: "white"
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "white"
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

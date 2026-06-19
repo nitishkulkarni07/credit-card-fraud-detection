@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | AI Fraud Shield</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(0, 191, 255, 0.35), transparent 35%),
+                radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.35), transparent 35%),
+                linear-gradient(135deg, #020617, #0f172a, #111827);
+            color: white;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .left-section h1 {
+            font-size: 58px;
+            margin-bottom: 15px;
+            color: #e0f2fe;
+        }
+
+        .left-section .tagline {
+            font-size: 18px;
+            color: #cbd5e1;
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            width: 85%;
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            padding: 18px;
+            margin-bottom: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            backdrop-filter: blur(15px);
+        }
+
+        .feature-card:hover {
+            transform: translateX(8px);
+            transition: 0.3s;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+        }
+
+        .feature-icon {
+            font-size: 30px;
+        }
+
+        .feature-card h3 {
+            color: #38bdf8;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .feature-card p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 430px;
+            margin: auto;
+            padding: 40px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.11);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            backdrop-filter: blur(22px);
+            box-shadow:
+                0 0 45px rgba(56, 189, 248, 0.25),
+                inset 0 0 18px rgba(255, 255, 255, 0.05);
+        }
+
+        .card-icon {
+            width: 75px;
+            height: 75px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 34px;
+            box-shadow: 0 0 28px rgba(56, 189, 248, 0.6);
+        }
+
+        .login-card h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: #e0f2fe;
+        }
+
+        .login-card .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 14px;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .input-group input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.45);
+        }
+
+        .input-group input::placeholder {
+            color: #64748b;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            transition: 0.3s;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 22px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.16);
+            border: 1px solid rgba(239, 68, 68, 0.75);
+            color: #fecaca;
+            padding: 12px;
+            border-radius: 13px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        @media screen and (max-width: 900px) {
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+
+            .left-section {
+                display: none;
+            }
+
+            .page {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+
+        <div class="login-container">
+
+            <div class="left-section">
+                <h1>AI Fraud Shield</h1>
+                <p class="tagline">
+                    Secure your digital payments with intelligent fraud detection and real-time transaction safety alerts.
+                </p>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <div>
+                        <h3>Real-Time Protection</h3>
+                        <p>Check whether a transaction is safe before proceeding.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div>
+                        <h3>Fast AI Prediction</h3>
+                        <p>Instant fraud risk score using machine learning.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <div>
+                        <h3>Smart Alerts</h3>
+                        <p>Get warning notifications for suspicious transactions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-section">
+
+                <div class="login-card">
+
+                    <div class="card-icon">💳</div>
+
+                    <h2>Welcome Back</h2>
+                    <p class="subtitle">Login to continue to your fraud detection dashboard</p>
+
+                    {% if error %}
+                    <div class="error-message">{{ error }}</div>
+                    {% endif %}
+
+                    <form action="/login" method="POST">
+
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" placeholder="Enter your email" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" name="password" placeholder="Enter your password" required>
+                        </div>
+
+                        <button type="submit" class="login-btn">Login Securely</button>
+
+                    </form>
+
+                    <p class="register-link">
+                        Don’t have an account?
+                        <a href="/register">Create Account</a>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
